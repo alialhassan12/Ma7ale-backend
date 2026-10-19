@@ -23,6 +23,10 @@ Route::prefix('admin')->group(function(){
 Route::middleware('auth:sanctum')->group(function(){
     Route::get('/auth/me',[AuthController::class,'checkAuth'])->name('me');
     Route::post('/auth/logout',[AuthController::class,'logout'])->name('logout');
+
+    // business-categories
+    Route::get('/business-categories',[BusinessCategoriesController::class,'getBusinessCategories'])->name('get-business-categories');
     
+    // business
+    Route::post('/business/create',[BusinessController::class,'createBusiness'])->name('create.business');
 });
-Route::post('/business/create',[BusinessController::class,'createBusiness'])->name('create.business');
