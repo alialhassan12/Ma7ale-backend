@@ -38,4 +38,15 @@ class User extends Authenticatable
     {
         return $this->hasMany(Business::class,'owner_id');
     }
+
+    public function businessMembers()
+    {
+        return $this->hasMany(BusinessMember::class);
+    }
+
+    public function memberBusinesses()
+    {
+        return $this->belongsToMany(Business::class, 'business_members','user_id','business_id','id','id')
+        ->withPivot('role');
+    }
 }

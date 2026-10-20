@@ -28,5 +28,6 @@ Route::middleware('auth:sanctum')->group(function(){
     Route::get('/business-categories',[BusinessCategoriesController::class,'getBusinessCategories'])->name('get-business-categories');
     
     // business
+    Route::get('/businesses',[BusinessController::class,'getBusinesses'])->name('get-businesses');
     Route::post('/business/create',[BusinessController::class,'createBusiness'])->name('create.business');
 });

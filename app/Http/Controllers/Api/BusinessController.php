@@ -76,4 +76,23 @@ class BusinessController extends Controller
             "business"=>$result['data']
         ],201);
     }
+
+    public function getBusinesses(Request $request){
+        $user=$request->user();
+
+        $result=$this->businessService->getBusinesses($user->id);
+
+        if(!$result['success']){
+            return response()->json([
+                "success"=>false,
+                "message"=>$result['message']
+            ],500);
+        }
+
+        return response()->json([
+            "success"=>true,
+            "message"=>$result['message'],
+            "businesses"=>$result['data']
+        ]);
+    }
 }

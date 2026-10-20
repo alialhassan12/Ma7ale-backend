@@ -32,4 +32,14 @@ class Business extends Model
     {
         return $this->belongsTo(User::class,'owner_id');
     }
+
+    public function members()
+    {
+        return $this->belongsToMany(
+            User::class,
+            'business_members',
+            'business_id',
+            'user_id'
+        )->withPivot('role');
+    }
 }
