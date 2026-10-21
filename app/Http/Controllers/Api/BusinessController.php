@@ -80,7 +80,18 @@ class BusinessController extends Controller
     public function getBusinesses(Request $request){
         $user=$request->user();
 
-        $result=$this->businessService->getBusinesses($user->id);
+        $filter="all";
+        $search="";
+
+        if($request->has("filter")){
+            $filter=$request->input("filter");
+        }
+        
+        if($request->has("search")){
+            $search=$request->input("search");
+        }
+
+        $result=$this->businessService->getBusinesses($user->id,$filter,$search);
 
         if(!$result['success']){
             return response()->json([

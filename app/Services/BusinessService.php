@@ -4,7 +4,6 @@ namespace App\Services;
 
 use App\DTOs\CreateBusinessDto;
 use App\Models\Business;
-use App\Models\User;
 use Exception;
 use Illuminate\Support\Facades\Log;
 
@@ -44,7 +43,7 @@ class BusinessService
         }
     }
 
-    public function getBusinesses($user_id){
+    public function getBusinesses($user_id,$filter,$search){
         try{
             // get owned and member businesses
             $query=Business::query()
@@ -54,10 +53,37 @@ class BusinessService
                         $query->where('users.id', $user_id);
                     }
                 ])
-                ->where(function ($query) use($user_id) {
-                    $query->where('owner_id',$user_id)
-                    ->orWhereHas('members',function($memberQuery) use($user_id){
-                        $memberQuery->where('users.id', $user_id);
+                ->where(function ($query) use($user_id,$filter,$search) {
+                    // $query->where('owner_id',$user_id)
+                    // filter by role
+                    $query->when($filter, function ($query) use ($filter,$user_id,$search) {
+                        if($filter=== 'all'){
+                            $query->where(function($q) use ($user_id) {
+                                $q->where('owner_id',$user_id)
+                                ->orWhereHas('members', function ($q) use ($user_id) {
+                                    $q->where('users.id', $user_id);
+                                });
+                            })
+                            ->when($search, function ($query) use ($search) {
+                                $query->where('name', 'like', "%$search%")
+                                ->orWhere('slug_store', 'like', "%$search%");
+                            });
+                        }else if($filter === 'owner') {
+                            $query->where('owner_id', $user_id)
+                                ->when($search, function ($query) use ($search) {
+                                    $query->where('name', 'like', "%$search%")
+                                    ->orWhere('slug_store', 'like', "%$search%");
+                                });
+                        } else if($filter === 'member') {
+                            // $query->where('owner_id', '!=', $user_id)
+                                $query->whereHas('members', function ($q) use ($user_id,$search) {
+                                    $q->where('users.id', $user_id)
+                                    ->when($search, function ($query) use ($search) {
+                                        $query->where('name', 'like', "%$search%")
+                                        ->orWhere('slug_store', 'like', "%$search%");
+                                    });
+                                });
+                        }
                     });
                 })->paginate(5);
 
